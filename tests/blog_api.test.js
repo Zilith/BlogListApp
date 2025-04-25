@@ -76,6 +76,16 @@ describe('HTTP POST', () => {
     assert.strictEqual(typeof likes.at(-1), 'number', 'new like is a number')
     assert.strictEqual(likes.at(-1), 0, 'new like value is 0')
   })
+  test.only('url is missing', async () => {
+    await api
+      .post('/api/blogs')
+      .send({
+        title: 'Big Data',
+        author: 'Diego',
+        likes: 4,
+      })
+      .expect(400)
+  })
 })
 
 after(async () => {
