@@ -44,6 +44,27 @@ describe('HTTP GET', () => {
   })
 })
 
+describe('HTTP POST', () => {
+  test.only('creates a new blog', async () => {
+    const newblog = new Blog({
+      title: 'Big Data',
+      author: 'Diego',
+      url: 'https://bigdata.com/',
+      likes: 4,
+    })
+    await newblog.save()
+    const response = await helper.blogsInDb()
+    const titles = response.map((blog) => blog.title)
+
+    assert.strictEqual(
+      response.length,
+      helper.initialBlogs.length + 1,
+      'the number of blogs increase'
+    )
+    assert.strictEqual(titles.includes('Big Data'), true)
+  })
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
