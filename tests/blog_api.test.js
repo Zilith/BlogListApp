@@ -63,7 +63,7 @@ describe('HTTP POST', () => {
     )
     assert.strictEqual(titles.includes('Big Data'), true)
   })
-  test.only('blog without likes is defaut to 0', async () => {
+  test('blog without likes is defaut to 0', async () => {
     const newblog = new Blog({
       title: 'Big Data',
       author: 'Diego',
@@ -76,13 +76,13 @@ describe('HTTP POST', () => {
     assert.strictEqual(typeof likes.at(-1), 'number', 'new like is a number')
     assert.strictEqual(likes.at(-1), 0, 'new like value is 0')
   })
-  test.only('title is missing', async () => {
+  test('title is missing', async () => {
     await api
       .post('/api/blogs')
       .send({ author: 'Diego', url: 'https://bigdata.com/', likes: 4 })
       .expect(400)
   })
-  test.only('url is missing', async () => {
+  test('url is missing', async () => {
     await api
       .post('/api/blogs')
       .send({
