@@ -22,21 +22,21 @@ describe('HTTP GET', () => {
   })
 
   test('all blogs are returned', async () => {
-    const result = await api.get('/api/blogs')
+    const result = await helper.blogsInDb()
 
-    assert.strictEqual(result.body.length, helper.initialBlogs.length)
+    assert.strictEqual(result.length, helper.initialBlogs.length)
   })
 
   test('a specific blog is within the returned blogs', async () => {
-    const result = await api.get('/api/blogs')
+    const result = await helper.blogsInDb()
 
-    const contents = result.body.map((blog) => blog.title)
+    const contents = result.map((blog) => blog.title)
     assert.strictEqual(contents.includes('React patterns'), true)
   })
 
-  test.only('blog post is named id, not _id', async () => {
-    const response = await api.get('/api/blogs')
-    for (const blog of response.body) {
+  test('blog post is named id, not _id', async () => {
+    const response = await helper.blogsInDb()
+    for (const blog of response) {
       assert.ok(blog.id, 'blog have the property id')
       assert.strictEqual(typeof blog.id, 'string')
       assert.strictEqual(blog._id, undefined, 'shoud not have _id')
