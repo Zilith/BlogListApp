@@ -94,6 +94,40 @@ describe('HTTP POST', () => {
   })
 })
 
+describe('HTTP PUT', () => {
+  /*
+    title: 'React patterns',
+    author: 'Michael Chan',
+    url: 'https://reactpatterns.com/',
+    likes: 7,
+  */
+
+  test('succeeds with statuscode 201 if id is valid', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    let blogToUpdate = blogsAtStart[0]
+
+    blogToUpdate.title = 'Angular patterns'
+
+    await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(blogToUpdate)
+      .expect(200)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    const titles = blogsAtEnd.map((blog) => blog.title)
+    assert(titles.includes('Angular patterns'))
+    assert.strictEqual(blogsAtEnd.length, blogsAtStart.length)
+  })
+
+  test.only('fails with a statuscode 400 if id is invalid', async () => {
+    const invalidId = '5a3d5da59070081a82a3445'
+    const blogsAtStart = await helper.blogsInDb()
+    let blogToUpdate = blogsAtStart[0]
+
+    await api.put(`/api/blogs/${invalidId}`).send(blogToUpdate).expect(400)
+  })
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
