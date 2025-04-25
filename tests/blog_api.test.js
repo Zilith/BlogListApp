@@ -45,7 +45,7 @@ describe('HTTP GET', () => {
 })
 
 describe('HTTP POST', () => {
-  test.only('creates a new blog', async () => {
+  test('creates a new blog', async () => {
     const newblog = new Blog({
       title: 'Big Data',
       author: 'Diego',
@@ -62,6 +62,19 @@ describe('HTTP POST', () => {
       'the number of blogs increase'
     )
     assert.strictEqual(titles.includes('Big Data'), true)
+  })
+  test.only('blog without likes is defaut to 0', async () => {
+    const newblog = new Blog({
+      title: 'Big Data',
+      author: 'Diego',
+      url: 'https://bigdata.com/',
+    })
+    await newblog.save()
+    const response = await helper.blogsInDb()
+    const likes = response.map((blog) => blog.likes)
+
+    assert.strictEqual(typeof likes.at(-1), 'number', 'new like is a number')
+    assert.strictEqual(likes.at(-1), 0, 'new like value is 0')
   })
 })
 
