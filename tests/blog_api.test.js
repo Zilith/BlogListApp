@@ -13,6 +13,36 @@ beforeEach(async () => {
   await Blog.insertMany(helper.initialBlogs)
 })
 
+describe('HTTP GET', () => {
+  test('blogs are returned as a json', async () => {
+    await api
+      .get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+  })
+
+  test('all blogs are returned', async () => {
+    const result = await api.get('/api/blogs')
+
+    assert.strictEqual(result.body.length, helper.initialBlogs.length)
+  })
+
+  test('a specific blog is within the returned blogs', async () => {
+    const result = await api.get('/api/blogs')
+
+    const contents = result.body.map((blog) => blog.title)
+    assert.strictEqual(contents.includes('React patterns'), true)
+  })
+
+  test.only('blog post is named id, not _id', async () => {
+    const response = await api.get('/api/blogs')
+    for (const blog of response.body) {
+      assert.ok(blog.id, 'blog have the property id')
+      assert.strictEqual(typeof blog.id, 'string')
+      assert.strictEqual(blog._id, undefined, 'shoud not have _id')
+    }
+  })
+})
 
 after(async () => {
   await mongoose.connection.close()
