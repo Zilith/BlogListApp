@@ -35,5 +35,6 @@ userRouter.post('/', async (req, res) => {
   return res.status(200).json(response)
 })
 
+//delete user
 
 module.exports = userRouter
