@@ -7,6 +7,7 @@ const cors = require('cors')
 const mongoose = require('mongoose')
 const blogRouter = require('./controllers/blogs')
 const middleware = require('./utils/middleware')
+const userRouter = require('./controllers/users')
 
 mongoose.set('strictQuery', false)
 
@@ -24,6 +25,7 @@ app.use(express.json())
 app.use(middleware.morganMiddleware)
 
 app.use('/api/blogs', blogRouter)
+app.use('/api/users', userRouter)
 
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)
