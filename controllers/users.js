@@ -12,14 +12,16 @@ userRouter.post('/', async (req, res) => {
   const { username, name, password } = req.body
   const saltRounds = 10
 
-  console.log('body', username, name, password)
-
   const user = await User.findOne({ username: username })
-
-  console.log('user result', user)
 
   if (user !== null) {
     return res.status(400).json({ error: 'the username already exist' })
+  }
+
+  if (password.length <= 2) {
+    return res
+      .status(400)
+      .json({ error: 'the password must be at least 3 characters long' })
   }
 
   const cryptPassword = await bcrypt.hash(password, saltRounds)
@@ -32,7 +34,7 @@ userRouter.post('/', async (req, res) => {
 
   const response = await newUser.save()
 
-  return res.status(200).json(response)
+  return res.status(201).json(response)
 })
 
 //delete user
