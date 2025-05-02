@@ -22,7 +22,7 @@ describe('HTTP POST', () => {
       .expect('Content-Type', /application\/json/)
   })
   test('a valid user is created', async () => {
-    const usersAtStart = await helper.blogsInDb()
+    const usersAtStart = await helper.usersInDb()
 
     const newUser = {
       username: 'Zilith',
@@ -38,6 +38,22 @@ describe('HTTP POST', () => {
     assert.strictEqual(response.body.username, newUser.username)
     assert.strictEqual(usersAtEnd.length, usersAtStart.length + 1)
     assert(usernames.includes(response.body.username))
+  })
+  test('a user with a invalid username is rejected with statuscode 400', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'AS',
+      name: 'invalidUser',
+      password: 'contraseña123',
+    }
+    await api.post('/api/users').send(newUser).expect(400)
+
+    const usersAtEnd = await helper.usersInDb()
+    const usernames = usersAtEnd.map((user) => user.username)
+
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+    assert(!usernames.includes(newUser.username))
   })
 })
 
