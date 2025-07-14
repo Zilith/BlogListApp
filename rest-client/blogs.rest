@@ -4,7 +4,7 @@
 @port = 3003 
 @APIAddress = {{host}}:{{port}}
 @id = 687562d583664579fc4124ff
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN1cGVydXNlciIsImlkIjoiNjg3NTcyOTUyZTRmNDMzODQ5MTg5NTU4IiwiaWF0IjoxNzUyNTI3NTEyfQ.pgwF7nbm386k-p2E-fpJ9PvJPFk7rx2b9uOu-LHwvwk
+@token = {{$processEnv TOKEN}}
 
 GET {{APIAddress}}/api/blogs
 Accept: application/json
@@ -17,10 +17,10 @@ Authorization: Bearer {{token}}
 
 
 {
-    "title": "Go To Statement Considered Harmful",
-    "author": "Edsger W. Dijkstra",
-    "url": "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
-    "likes": 5
+    "title": "React patterns",
+    "author": "Michael Chan",
+    "url": "https://reactpatterns.com/",
+    "likes": 7
 }
 
 ###

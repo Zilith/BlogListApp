@@ -12,8 +12,8 @@ Content-Type: application/json
 
 
 {
-    "username": "superuser",
-    "password": "supercontraseña"
+    "username": "normaluser",
+    "password": "normalcontraseña"
 }
 
 ###
