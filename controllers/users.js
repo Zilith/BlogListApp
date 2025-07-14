@@ -9,7 +9,7 @@ userRouter.get('/', async (req, res) => {
     url: 1,
   })
 
-  res.status(201).json(users)
+  res.status(200).json(users)
 })
 
 userRouter.post('/', async (req, res) => {
@@ -20,6 +20,10 @@ userRouter.post('/', async (req, res) => {
 
   if (user !== null) {
     return res.status(400).json({ error: 'the username already exist' })
+  }
+
+  if (!username || !password) {
+    return res.status(400).json({ error: 'username or password missing' })
   }
 
   if (password.length <= 2) {
