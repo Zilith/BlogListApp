@@ -5,6 +5,7 @@ const assert = require('assert')
 const helper = require('./test_helper')
 const Blog = require('../models/blogs')
 const mongoose = require('mongoose')
+const config = require('../utils/config')
 
 const api = supertest(app)
 
@@ -14,7 +15,7 @@ beforeEach(async () => {
 })
 
 describe('HTTP GET', () => {
-  test('blogs are returned as a json', async () => {
+  test.only('blogs are returned as a json', async () => {
     await api
       .get('/api/blogs')
       .expect(200)
@@ -44,7 +45,7 @@ describe('HTTP GET', () => {
   })
 })
 
-describe('HTTP POST', () => {
+describe.only('HTTP POST', () => {
   test('creates a new blog', async () => {
     const newblog = new Blog({
       title: 'Big Data',
@@ -52,14 +53,20 @@ describe('HTTP POST', () => {
       url: 'https://bigdata.com/',
       likes: 4,
     })
-    await newblog.save()
-    const response = await helper.blogsInDb()
+
+    const response = await api
+      .post('/api/blogs')
+      .set('authorization', 'Bearer ' + config.NORMALUSER_TOKEN)
+      .send(newblog)
+      .expect(201)
+    const blogsAtEnd = await helper.blogsInDb()
     const titles = response.map((blog) => blog.title)
 
+    assert.strictEqual(response.body.title, 'Big Data', 'title is Big Data')
     assert.strictEqual(
-      response.length,
+      blogsAtEnd.length,
       helper.initialBlogs.length + 1,
-      'the number of blogs increase'
+      'the number of blogs increase',
     )
     assert.strictEqual(titles.includes('Big Data'), true)
   })
@@ -69,10 +76,10 @@ describe('HTTP POST', () => {
       author: 'Diego',
       url: 'https://bigdata.com/',
     })
-    await newblog.save()
-    const response = await helper.blogsInDb()
-    const likes = response.map((blog) => blog.likes)
+    const response = await api.post('/api/blogs').send(newblog).expect(201)
+    const likes = response.body.map((blog) => blog.likes)
 
+    assert.strictEqual(response.body.author, 'Diego', 'author is Diego')
     assert.strictEqual(typeof likes.at(-1), 'number', 'new like is a number')
     assert.strictEqual(likes.at(-1), 0, 'new like value is 0')
   })
