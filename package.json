@@ -11,7 +11,8 @@
     "dev": "cross-env NODE_ENV=development node --watch index.js",
     "test": "cross-env NODE_ENV=test node --test",
     "only": "cross-env NODE_OPTIONS=--test-only NODE_ENV=test node --test",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "debug": "cross-env port=4040 nodemon --inspect index.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
@@ -30,6 +31,7 @@
     "@stylistic/eslint-plugin-js": "^4.2.0",
     "eslint": "^9.23.0",
     "globals": "^16.0.0",
+    "nodemon": "^3.1.10",
     "supertest": "^7.1.0"
   }
 }
