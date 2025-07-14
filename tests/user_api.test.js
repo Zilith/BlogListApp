@@ -5,7 +5,6 @@ const assert = require('assert')
 const helper = require('./test_helper')
 const User = require('../models/users')
 const mongoose = require('mongoose')
-//const User = require('../models/users')
 
 const api = supertest(app)
 
@@ -18,7 +17,7 @@ describe('HTTP POST', () => {
   test('users are returned as a json', async () => {
     await api
       .get('/api/users')
-      .expect(201)
+      .expect(200)
       .expect('Content-Type', /application\/json/)
   })
   test('a valid user is created', async () => {

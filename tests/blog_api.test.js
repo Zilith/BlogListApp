@@ -5,7 +5,6 @@ const assert = require('assert')
 const helper = require('./test_helper')
 const Blog = require('../models/blogs')
 const mongoose = require('mongoose')
-const config = require('../utils/config')
 
 const api = supertest(app)
 
@@ -15,7 +14,7 @@ beforeEach(async () => {
 })
 
 describe('HTTP GET', () => {
-  test.only('blogs are returned as a json', async () => {
+  test('blogs are returned as a json', async () => {
     await api
       .get('/api/blogs')
       .expect(200)
@@ -45,22 +44,27 @@ describe('HTTP GET', () => {
   })
 })
 
-describe.only('HTTP POST', () => {
+describe('HTTP POST', () => {
   test('creates a new blog', async () => {
-    const newblog = new Blog({
+    const newblog = {
       title: 'Big Data',
       author: 'Diego',
       url: 'https://bigdata.com/',
       likes: 4,
-    })
+    }
+
+    const token = helper.generateToken()
 
     const response = await api
       .post('/api/blogs')
-      .set('authorization', 'Bearer ' + config.NORMALUSER_TOKEN)
+      .set({
+        authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      })
       .send(newblog)
       .expect(201)
+
     const blogsAtEnd = await helper.blogsInDb()
-    const titles = response.map((blog) => blog.title)
 
     assert.strictEqual(response.body.title, 'Big Data', 'title is Big Data')
     assert.strictEqual(
@@ -68,36 +72,80 @@ describe.only('HTTP POST', () => {
       helper.initialBlogs.length + 1,
       'the number of blogs increase',
     )
-    assert.strictEqual(titles.includes('Big Data'), true)
   })
   test('blog without likes is defaut to 0', async () => {
-    const newblog = new Blog({
+    const newblog = {
       title: 'Big Data',
       author: 'Diego',
       url: 'https://bigdata.com/',
-    })
-    const response = await api.post('/api/blogs').send(newblog).expect(201)
-    const likes = response.body.map((blog) => blog.likes)
+    }
 
-    assert.strictEqual(response.body.author, 'Diego', 'author is Diego')
-    assert.strictEqual(typeof likes.at(-1), 'number', 'new like is a number')
-    assert.strictEqual(likes.at(-1), 0, 'new like value is 0')
+    const token = helper.generateToken()
+
+    const response = await api
+      .post('/api/blogs')
+      .set({
+        authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      })
+      .send(newblog)
+      .expect(201)
+
+    assert.strictEqual(response.body.likes, 0, 'new like value is 0')
+    assert.strictEqual(
+      typeof response.body.likes,
+      'number',
+      'new like is a number',
+    )
   })
   test('title is missing', async () => {
+    const token = helper.generateToken()
+
     await api
       .post('/api/blogs')
+      .set({
+        authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      })
       .send({ author: 'Diego', url: 'https://bigdata.com/', likes: 4 })
       .expect(400)
   })
   test('url is missing', async () => {
+    const token = helper.generateToken()
+
     await api
       .post('/api/blogs')
+      .set({
+        authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      })
       .send({
         title: 'Big Data',
         author: 'Diego',
         likes: 4,
       })
       .expect(400)
+  })
+  test('fails with status code 401 if token is not provided', async () => {
+    const newblog = {
+      title: 'Big Data',
+      author: 'Diego',
+      url: 'https://bigdata.com/',
+      likes: 4,
+    }
+    const response = await api
+      .post('/api/blogs')
+      .set({
+        'Content-Type': 'application/json',
+      })
+      .send(newblog)
+      .expect(401)
+
+    assert.strictEqual(
+      response.body.error,
+      'invalid token',
+      'error message is correct',
+    )
   })
 })
 
@@ -126,7 +174,7 @@ describe('HTTP PUT', () => {
     assert.strictEqual(blogsAtEnd.length, blogsAtStart.length)
   })
 
-  test.only('fails with a statuscode 400 if id is invalid', async () => {
+  test('fails with a statuscode 400 if id is invalid', async () => {
     const invalidId = '5a3d5da59070081a82a3445'
     const blogsAtStart = await helper.blogsInDb()
     let blogToUpdate = blogsAtStart[0]
@@ -138,9 +186,17 @@ describe('HTTP PUT', () => {
 describe('HTTP DELETE', () => {
   test('succeeds with statuscode 204 if id is valid', async () => {
     const blogsAtStart = await helper.blogsInDb()
-    const blogToDelete = blogsAtStart[0]
+    const blogToDelete = blogsAtStart[1]
 
-    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
+    const token = helper.generateToken()
+
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .set({
+        authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      })
+      .expect(204)
 
     const blogsAtEnd = await helper.blogsInDb()
     const titles = blogsAtEnd.map((blog) => blog.title)
@@ -150,8 +206,15 @@ describe('HTTP DELETE', () => {
 
   test('fails with a statuscode 400 if id is invalid', async () => {
     const invalidId = '5a3d5da59070081a82a3445'
+    const token = helper.generateToken()
 
-    await api.delete(`/api/blogs/${invalidId.id}`).expect(400)
+    await api
+      .delete(`/api/blogs/${invalidId.id}`)
+      .set({
+        authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      })
+      .expect(400)
   })
 })
 
