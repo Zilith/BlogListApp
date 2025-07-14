@@ -1,0 +1,23 @@
+@host = http://localhost
+# debug: 4040
+# dev: 3003
+@port = 3003 
+@APIAddress = {{host}}:{{port}}
+@id = 681ec82f8d9cfd4aaf787379
+
+GET {{APIAddress}}/api/users
+Accept: application/json
+###
+
+POST {{APIAddress}}/api/users
+Accept: application/json
+Content-Type: application/json
+
+
+{
+    "name": "root",
+    "username": "superuser",
+    "password": "supercontraseña"
+}
+
+###
